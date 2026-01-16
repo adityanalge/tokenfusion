@@ -1,0 +1,18 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: #014421;
+  min-height: 100vh;
+  color: #e2e8f0;
+}
+
+code {
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+}
