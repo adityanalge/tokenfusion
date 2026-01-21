@@ -1,0 +1,117 @@
+[
+  {
+    "server_id": "srv-000000",
+    "hostname": "node-eu-central-1-0000",
+    "ip_address": "127.52.133.181",
+    "status": "active",
+    "metrics": {
+      "cpu_utilization_pct": 44.3,
+      "ram_usage_gb": 82.15,
+      "storage_used_pct": 37.41,
+      "network_traffic": {
+        "incoming_mbps": 720.17,
+        "outgoing_mbps": 4198.46,
+        "active_connections": 47125
+      }
+    },
+    "tags": [
+      "eu-central-1",
+      "production",
+      "monitoring-enabled"
+    ],
+    "uptime_seconds": 3631074,
+    "health_score": 0.9
+  },
+  {
+    "server_id": "srv-000001",
+    "hostname": "node-us-west-2-0001",
+    "ip_address": "146.221.192.182",
+    "status": "active",
+    "metrics": {
+      "cpu_utilization_pct": 15.76,
+      "ram_usage_gb": 108.92,
+      "storage_used_pct": 43.26,
+      "network_traffic": {
+        "incoming_mbps": 393.29,
+        "outgoing_mbps": 1510.81,
+        "active_connections": 40338
+      }
+    },
+    "tags": [
+      "us-west-2",
+      "production",
+      "monitoring-enabled"
+    ],
+    "uptime_seconds": 2402755,
+    "health_score": 0.88
+  },
+  {
+    "server_id": "srv-000002",
+    "hostname": "node-ap-southeast-1-0002",
+    "ip_address": "14.234.93.99",
+    "status": "high-load",
+    "metrics": {
+      "cpu_utilization_pct": 39.36,
+      "ram_usage_gb": 27.01,
+      "storage_used_pct": 28.51,
+      "network_traffic": {
+        "incoming_mbps": 210.56,
+        "outgoing_mbps": 1441.44,
+        "active_connections": 39451
+      }
+    },
+    "tags": [
+      "ap-southeast-1",
+      "production",
+      "monitoring-enabled"
+    ],
+    "uptime_seconds": 4866339,
+    "health_score": 0.78
+  },
+  {
+    "server_id": "srv-000003",
+    "hostname": "node-us-west-2-0003",
+    "ip_address": "169.235.77.22",
+    "status": "active",
+    "metrics": {
+      "cpu_utilization_pct": 76.56,
+      "ram_usage_gb": 64.28,
+      "storage_used_pct": 55.47,
+      "network_traffic": {
+        "incoming_mbps": 581.56,
+        "outgoing_mbps": 343.2,
+        "active_connections": 43617
+      }
+    },
+    "tags": [
+      "us-west-2",
+      "production",
+      "monitoring-enabled"
+    ],
+    "uptime_seconds": 3152834,
+    "health_score": 0.99
+  },
+  {
+    "server_id": "srv-000004",
+    "hostname": "node-us-east-1-0004",
+    "ip_address": "63.218.80.67",
+    "status": "active",
+    "metrics": {
+      "cpu_utilization_pct": 60.32,
+      "ram_usage_gb": 30.59,
+      "storage_used_pct": 10.82,
+      "network_traffic": {
+        "incoming_mbps": 253.59,
+        "outgoing_mbps": 2409.52,
+        "active_connections": 47759
+      }
+    },
+    "tags": [
+      "us-east-1",
+      "production",
+      "monitoring-enabled"
+    ],
+    "uptime_seconds": 128739,
+    "health_score": 0.94
+  }
+]
