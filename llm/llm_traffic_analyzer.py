@@ -63,8 +63,10 @@ def _load_server_metrics_toon(path: str) -> List[Dict[str, Any]]:
       [1000]{field1,field2,...}:
         v1,v2,...,{...},[...],...
     """
-    with open(path, "r", encoding="utf-8") as f:
-        lines = [ln.rstrip("\n") for ln in f]
+    with open(path, "r", encoding="utf-8", newline="") as f:
+        # Use splitlines() to handle all line ending types (\n, \r\n, \r) cross-platform
+        content = f.read()
+        lines = content.splitlines()
 
     lines = [ln for ln in lines if ln.strip()]
     if not lines:
