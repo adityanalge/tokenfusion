@@ -15,8 +15,7 @@ AWS_SECRET_KEY = "YOUR_AWS_SECRET_KEY"
 # Configuration
 REGION = "us-east-2"
 MODEL_ID = (
-    "arn:aws:bedrock:us-east-2:528214696964:"
-    "inference-profile/us.anthropic.claude-3-5-haiku-20241022-v1:0"
+    "arn:aws:bedrock:us-east-2:528214696964:inference-profile/us.anthropic.claude-3-5-haiku-20241022-v1:0"
 )
 
 # Generation parameters
@@ -130,12 +129,20 @@ def load_toon_file(path: str):
 
 
 def load_file(path: str):
-    """Load either JSON or TOON file."""
+    """Load either JSON or TOON file. Returns (parsed_data, format, raw_content)."""
     if path.lower().endswith(".toon"):
-        return load_toon_file(path)
+        # For TOON, return the raw text to preserve token efficiency
+        with open(path, "r", encoding="utf-8", newline="") as f:
+            raw_content = f.read()
+        # Also parse it for validation
+        parsed_data = load_toon_file(path)
+        return parsed_data, "toon", raw_content
     else:
+        # For JSON, read raw content and parse
         with open(path, "r", encoding="utf-8") as f:
-            return json.load(f)
+            raw_content = f.read()
+        parsed_data = json.loads(raw_content)
+        return parsed_data, "json", raw_content
 
 
 def estimate_tokens(text: str) -> int:
@@ -156,13 +163,13 @@ def estimate_tokens(text: str) -> int:
     return len(text) // 3
 
 
-def check_input_size(prompt: str, file_data):
+def check_input_size(prompt: str, file_content: str, file_format: str):
     """
     Check if the input exceeds token limits and raise an error if it does.
     Pre-flight check to avoid costly Bedrock API calls.
+    Uses raw file content to preserve TOON's token efficiency.
     """
-    file_content = json.dumps(file_data, indent=2, ensure_ascii=False)
-    user_message = f"{prompt}\n\nFile data:\n{file_content}"
+    user_message = f"{prompt}\n\nFile data ({file_format.upper()} format):\n{file_content}"
     
     # Estimate tokens
     estimated_tokens = estimate_tokens(user_message)
@@ -182,21 +189,21 @@ def check_input_size(prompt: str, file_data):
     return estimated_tokens
 
 
-def invoke_bedrock(prompt: str, file_data):
-    """Invoke Bedrock with a prompt and file data."""
+def invoke_bedrock(prompt: str, file_content: str, file_format: str):
+    """Invoke Bedrock with a prompt and file content (preserves TOON format for token efficiency)."""
     # Pre-flight check to avoid costly API calls
-    estimated_tokens = check_input_size(prompt, file_data)
-    print(f"Estimated input tokens: {estimated_tokens:,}")
+    estimated_tokens = check_input_size(prompt, file_content, file_format)
+    print(f"Estimated input tokens: {estimated_tokens:,} ({file_format.upper()} format)")
     
     client = boto3.client(
         service_name="bedrock-runtime",
-        region_name=REGION
+        region_name=REGION,
+        aws_access_key_id=AWS_KEY,
+        aws_secret_access_key=AWS_SECRET_KEY
     )
 
-    # Convert file data to JSON string for the prompt
-    file_content = json.dumps(file_data, indent=2, ensure_ascii=False)
-    
-    user_message = f"{prompt}\n\nFile data:\n{file_content}"
+    # Use raw file content directly - preserves TOON's token efficiency
+    user_message = f"{prompt}\n\nFile data ({file_format.upper()} format):\n{file_content}"
 
     messages = [
         {
@@ -228,11 +235,11 @@ def invoke_bedrock(prompt: str, file_data):
         error_code = e.response.get("Error", {}).get("Code", "Unknown")
         error_msg = e.response.get("Error", {}).get("Message", str(e))
         
-        # Check for common token/size-related errors from Bedrock
+        # Check for token/size-related errors
         error_lower = error_msg.lower()
         if any(keyword in error_lower for keyword in [
-            "token", "too large", "exceed", "limit", "context", 
-            "maximum", "size", "length", "validation"
+            "too large", "exceed", "context window", "context limit",
+            "maximum tokens", "input too long", "request too large"
         ]):
             raise ValueError(
                 f"❌ Input file is too large for the model context window!\n\n"
@@ -270,14 +277,14 @@ if __name__ == "__main__":
     args = parser.parse_args()
     
     try:
-        # Load the file
+        # Load the file (returns data, format, raw_content)
         print(f"Loading file: {args.file}")
-        file_data = load_file(args.file)
-        print(f"File loaded successfully ({len(file_data) if isinstance(file_data, list) else 'object'} items)")
+        file_data, file_format, file_content = load_file(args.file)
+        print(f"File loaded successfully ({len(file_data) if isinstance(file_data, list) else 'object'} items, {file_format.upper()} format)")
         
-        # Invoke Bedrock
+        # Invoke Bedrock with raw content to preserve TOON's token efficiency
         print(f"\nSending prompt to Bedrock...")
-        result = invoke_bedrock(args.prompt, file_data)
+        result = invoke_bedrock(args.prompt, file_content, file_format)
         
         # Print result
         print("\n=== Bedrock Response ===")
